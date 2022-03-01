@@ -130,15 +130,12 @@ function dumpDB(db, tableName, fn) {
   return new goog.Promise(function(resolve, reject) {
     var results = [];
     var tx = db.transaction([tableName], 'readonly');
-    var req = tx.objectStore(tableName).openCursor();
+    var req = tx.objectStore(tableName).getAll();
     req.onsuccess = function(ev) {
-      var cursor = req.result;
-      if (cursor) {
-        results.push(fn(cursor.value));
-        cursor.continue();
-      } else {
-        resolve(results);
+      for (const val of req.result) {
+        results.push(fn(val));
       }
+      resolve(results);
     };
     req.onerror = reject;
   });
